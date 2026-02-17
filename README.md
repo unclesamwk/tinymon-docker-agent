@@ -123,7 +123,9 @@ Add these labels to containers you want to monitor:
 
 ## Examples
 
-**Basic container monitoring:**
+### Basic container monitoring
+
+docker-compose:
 
 ```yaml
 services:
@@ -135,7 +137,22 @@ services:
       tinymon.topic: "production/web"
 ```
 
-**With HTTP and certificate checks:**
+docker run:
+
+```bash
+docker run -d --name web \
+  --label tinymon.enable=true \
+  --label tinymon.name="Webserver" \
+  --label tinymon.topic="production/web" \
+  nginx
+```
+
+### With HTTP and certificate checks
+
+Monitors the container status **and** creates an HTTP health check + certificate expiry check in TinyMon.
+TinyMon executes these checks independently (pull mode).
+
+docker-compose:
 
 ```yaml
 services:
@@ -150,7 +167,24 @@ services:
       tinymon.certificate.host: "app.example.com"
 ```
 
-**With custom HTTP path and port:**
+docker run:
+
+```bash
+docker run -d --name app \
+  --label tinymon.enable=true \
+  --label tinymon.name="My Application" \
+  --label tinymon.topic="production/apps" \
+  --label tinymon.http.url="https://app.example.com/health" \
+  --label tinymon.http.expected-status=200 \
+  --label tinymon.certificate.host="app.example.com" \
+  myapp
+```
+
+### With custom HTTP path and port
+
+Useful when the service runs on a non-standard port or the health endpoint is not at `/`.
+
+docker-compose:
 
 ```yaml
 services:
@@ -162,6 +196,18 @@ services:
       tinymon.http.path: "/api/health"
       tinymon.http.port: "8080"
       tinymon.check-interval: "120"
+```
+
+docker run:
+
+```bash
+docker run -d --name api \
+  --label tinymon.enable=true \
+  --label tinymon.name="API Server" \
+  --label tinymon.http.path="/api/health" \
+  --label tinymon.http.port=8080 \
+  --label tinymon.check-interval=120 \
+  myapi
 ```
 
 ## Environment Variables
