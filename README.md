@@ -27,6 +27,17 @@ The agent polls the Docker socket at a configurable interval, finds all containe
 
 ## Quick Start
 
+### Prerequisites
+
+- A running [TinyMon](https://github.com/unclesamwk/TinyMon) instance
+- The **Push API key** (`PUSH_API_KEY` from TinyMon's `.env` file)
+- Docker installed on the host you want to monitor
+
+### Step 1: Add the agent to your docker-compose.yml
+
+Add the `tinymon-agent` service to the `docker-compose.yml` on the host you want to monitor.
+It needs read-only access to the Docker socket to discover running containers.
+
 ```yaml
 services:
   tinymon-agent:
@@ -35,10 +46,37 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
-      TINYMON_URL: "https://mon.example.com"
-      TINYMON_API_KEY: "your-push-api-key"
-      AGENT_NAME: "my-docker-host"
+      TINYMON_URL: "https://mon.example.com"   # URL of your TinyMon instance
+      TINYMON_API_KEY: "your-push-api-key"     # PUSH_API_KEY from TinyMon .env
+      AGENT_NAME: "my-docker-host"             # A unique name for this Docker host
 ```
+
+### Step 2: Add labels to containers you want to monitor
+
+On any container you want to monitor, add `tinymon.enable: "true"` as a label.
+The agent picks up new containers automatically -- no restart of the agent needed.
+
+```yaml
+services:
+  web:
+    image: nginx
+    labels:
+      tinymon.enable: "true"
+      tinymon.name: "My Webserver"
+```
+
+### Step 3: Start everything
+
+```bash
+docker compose up -d
+```
+
+The agent starts polling every 60 seconds (configurable via `INTERVAL`).
+Within a minute, your container appears in the TinyMon dashboard.
+
+When a container stops or becomes unhealthy, TinyMon sends an alert.
+When it recovers, TinyMon sends a recovery notification.
+
 
 ## Labels
 
