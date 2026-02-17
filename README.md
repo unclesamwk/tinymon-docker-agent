@@ -33,10 +33,11 @@ The agent polls the Docker socket at a configurable interval, finds all containe
 - The **Push API key** (`PUSH_API_KEY` from TinyMon's `.env` file)
 - Docker installed on the host you want to monitor
 
-### Step 1: Add the agent to your docker-compose.yml
+### Step 1: Start the agent
 
-Add the `tinymon-agent` service to the `docker-compose.yml` on the host you want to monitor.
-It needs read-only access to the Docker socket to discover running containers.
+The agent needs read-only access to the Docker socket to discover running containers.
+
+**With docker-compose** -- add the agent to your `docker-compose.yml`:
 
 ```yaml
 services:
@@ -51,10 +52,24 @@ services:
       AGENT_NAME: "my-docker-host"             # A unique name for this Docker host
 ```
 
+**With docker run:**
+
+```bash
+docker run -d --name tinymon-agent \
+  --restart unless-stopped \
+  -v /var/run/docker.sock:/var/run/docker.sock:ro \
+  -e TINYMON_URL="https://mon.example.com" \
+  -e TINYMON_API_KEY="your-push-api-key" \
+  -e AGENT_NAME="my-docker-host" \
+  unclesamwk/tinymon-docker-agent
+```
+
 ### Step 2: Add labels to containers you want to monitor
 
-On any container you want to monitor, add `tinymon.enable: "true"` as a label.
+On any container you want to monitor, add `tinymon.enable` as a label.
 The agent picks up new containers automatically -- no restart of the agent needed.
+
+**In docker-compose.yml:**
 
 ```yaml
 services:
@@ -63,6 +78,15 @@ services:
     labels:
       tinymon.enable: "true"
       tinymon.name: "My Webserver"
+```
+
+**With docker run:**
+
+```bash
+docker run -d --name web \
+  --label tinymon.enable=true \
+  --label tinymon.name="My Webserver" \
+  nginx
 ```
 
 ### Step 3: Start everything
