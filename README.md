@@ -252,4 +252,4 @@ Available on Docker Hub as [`unclesamwk/tinymon-docker-agent`](https://hub.docke
 
 ## License
 
-MIT
+[MIT](LICENSE)
