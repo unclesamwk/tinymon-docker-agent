@@ -17,6 +17,7 @@ type ContainerInfo struct {
 	Health         string
 	ExitCode       int
 	Labels         map[string]string
+	TinyMonLabels  map[string]string
 	DisplayName    string
 	Topic          string
 	CheckInterval  int
@@ -73,6 +74,16 @@ func parseContainer(c types.Container) ContainerInfo {
 		DisplayName:   labelStr(labels, "tinymon.name", name),
 		Topic:         labelStr(labels, "tinymon.topic", ""),
 		CheckInterval: labelInt(labels, "tinymon.check-interval", 60, 30),
+	}
+
+	tinymonLabels := make(map[string]string)
+	for k, v := range labels {
+		if strings.HasPrefix(k, "tinymon.label.") {
+			tinymonLabels[strings.TrimPrefix(k, "tinymon.label.")] = v
+		}
+	}
+	if len(tinymonLabels) > 0 {
+		info.TinyMonLabels = tinymonLabels
 	}
 
 	if c.Status != "" && strings.Contains(c.Status, "(health:") {

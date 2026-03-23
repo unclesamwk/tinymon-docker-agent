@@ -118,8 +118,11 @@ Add these labels to containers you want to monitor:
 | `tinymon.http.expected-status` | Expected HTTP status code | 200 | No |
 | `tinymon.certificate.host` | Hostname for certificate check (pull mode) | - | No |
 | `tinymon.certificate.port` | Port for certificate check | 443 | No |
+| `tinymon.label.*` | Custom labels forwarded to TinyMon host (e.g. `tinymon.label.env=prod`) | - | No |
 
 **Pull mode**: The agent only creates the check in TinyMon. TinyMon executes the HTTP/certificate check independently.
+
+**Labels**: Docker labels with the `tinymon.label.` prefix are forwarded as key-value labels to the TinyMon host. These can be used for filtering in the TinyMon dashboard.
 
 ## Examples
 

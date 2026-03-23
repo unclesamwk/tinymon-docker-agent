@@ -48,6 +48,7 @@ func (a *Agent) Sync(ctx context.Context) {
 			Address:     addr,
 			Description: fmt.Sprintf("Container %s", c.Name),
 			Topic:       topic,
+			Labels:      c.TinyMonLabels,
 			Enabled:     1,
 		}
 		if err := a.tm.UpsertHost(host); err != nil {
